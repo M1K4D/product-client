@@ -9,8 +9,6 @@ function updateAlert() {
   alert("update failed!");
 }
 
-function uploadErr() {}
-
 function App() {
   const [productList, setProductList] = useState([]);
   const [updateProduct, setUpdateProduct] = useState(false);
@@ -23,10 +21,10 @@ function App() {
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [errUploadImg, setErrUploadImg] = useState(false);
+  // const [errUploadImg, setErrUploadImg] = useState();
 
-  const [photo, setPhoto] = useState();
-  const [nameImg, setNameImg] = useState("");
+  const [img, setImg] = useState({});
+  // const [nameImg, setnameImg] = useState();
 
   const getProduct = () => {
     Axios.get("http://localhost:3000/product").then((response) => {
@@ -34,7 +32,8 @@ function App() {
     });
   };
 
-  const addProduct = () => {
+  const addProduct = (nameImg) => {
+    console.log(nameImg);
     Axios.post("http://localhost:3000/product/create", {
       img: nameImg,
       sku: sku,
@@ -47,7 +46,7 @@ function App() {
     })
       .then((response) => {
         getProduct();
-        console.log(response.data);
+        // console.log(response.data);
       })
       .catch((err) => {
         console.log(err);
@@ -74,19 +73,19 @@ function App() {
       });
   };
 
-  const uploadImg = () => {
+  async function uploadImg() {
     const fd = new FormData();
-    fd.append("file", photo, photo.name);
-    Axios.post("http://localhost:3000/product/uploadimage", fd)
-      .then((res) => {
-        console.log(res);
-        setNameImg(res.data.imagePath);
-      })
-      .catch((err) => {
-        console.log(err);
-        setErrUploadImg(true);
-      });
-  };
+    fd.append("file", img, img.name);
+    const data = await Axios.post(
+      "http://localhost:3000/product/uploadimage",
+      fd
+    ).then((response) => {
+      console.log(response.data.imagePath);
+      return response.data.imagePath;
+    });
+
+    return data;
+  }
 
   const deleteProduct = (id) => {
     Axios.delete(`http://localhost:3000/product/delete/${id}`).then(
@@ -100,14 +99,6 @@ function App() {
     );
   };
 
-  // const getImg = (imgname) => {
-  //   Axios.get(
-  //     `http://localhost:3000/product/product-img/IMG_33144aa37ed9-c0be-4e5b-8d64-c5401da6aabc.jpg`
-  //   ).then((response) => {
-  //     console.log(response);
-  //   });
-  // };
-
   useEffect(() => {
     getProduct((err) => {
       console.log(err);
@@ -116,18 +107,9 @@ function App() {
   }, []);
 
   async function handlerSubmit() {
-    try {
-      await uploadImg();
-      if (errUploadImg) {
-        alert("uploadImg failed!");
-        throw new Error("uploadImg failed!");
-      }
-      await addProduct();
-      setPhoto();
-      setNameImg("");
-    } catch (err) {
-      console.log(err);
-    }
+    const nameImg = await uploadImg();
+
+    addProduct(nameImg);
   }
 
   return (
@@ -313,11 +295,13 @@ function App() {
             <div class="col-auto">
               <div class="row">
                 <div class="col-auto">
-                  {" "}
                   <button
                     type="submit"
                     class="btn btn btn-success"
-                    onClick={() => handlerSubmit()}
+                    onClick={() => {
+                      handlerSubmit();
+                      document.getElementById("fileInput").value = "";
+                    }}
                   >
                     Submit
                   </button>
@@ -325,12 +309,14 @@ function App() {
 
                 <div class="col-sm-3">
                   <input
+                    id="fileInput"
                     type="file"
                     class="form-control"
                     aria-label="file example"
+                    a
                     onChange={(event) => {
-                      setPhoto(event.target.files[0]);
-                      console.log(photo);
+                      setImg(event.target.files[0]);
+                      console.log(event.target.files[0]);
                     }}
                   ></input>
                 </div>
@@ -366,12 +352,16 @@ function App() {
                     <tr>
                       <th scope="row">{val.id}</th>
                       <td>
-                        <img
-                          src={`http://localhost:3000/product/product-img/${val.img}`}
-                          alt="Trulli"
-                          width="40"
-                          height="40"
-                        ></img>
+                        <a
+                          href={`http://localhost:3000/product/product-img/${val.img}`}
+                        >
+                          <img
+                            src={`http://localhost:3000/product/product-img/${val.img}`}
+                            alt="Trulli"
+                            width="40"
+                            height="40"
+                          ></img>
+                        </a>
                       </td>
                       <td>{val.sku}</td>
                       <td>{val.name}</td>
