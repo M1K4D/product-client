@@ -11,6 +11,10 @@ function updateAlert() {
 
 function App() {
   const [productList, setProductList] = useState([]);
+  // const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(10);
+
   const [updateProduct, setUpdateProduct] = useState(false);
 
   const [id, setId] = useState(0);
@@ -21,10 +25,8 @@ function App() {
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  // const [errUploadImg, setErrUploadImg] = useState();
 
   const [img, setImg] = useState({});
-  // const [nameImg, setnameImg] = useState();
 
   const getProduct = () => {
     Axios.get("http://localhost:3000/product").then((response) => {
@@ -107,10 +109,26 @@ function App() {
   }, []);
 
   async function handlerSubmit() {
-    const nameImg = await uploadImg();
-
-    addProduct(nameImg);
+    try {
+      const nameImg = await uploadImg();
+      addProduct(nameImg);
+    } catch (err) {
+      console.log(err);
+      addAlert();
+    }
   }
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = productList.slice(indexOfFirstPost, indexOfLastPost);
+
+  const pageNumbers = [];
+
+  for (let i = 1; i <= Math.ceil(productList.length / postsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="App container">
@@ -346,8 +364,7 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {productList.map((val, key) => {
-                  // getImg();
+                {currentPosts.map((val, key) => {
                   return (
                     <tr>
                       <th scope="row">{val.id}</th>
@@ -404,6 +421,21 @@ function App() {
               </tbody>
             </table>
           </div>
+          <nav>
+            <ul className="pagination">
+              {pageNumbers.map((number) => (
+                <li key={number} className="page-item">
+                  <a
+                    onClick={() => paginate(number)}
+                    href="!#"
+                    className="page-link"
+                  >
+                    {number}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
