@@ -30,6 +30,7 @@ function App() {
 
   const getProduct = () => {
     Axios.get("http://localhost:3000/product").then((response) => {
+      console.log(response.data.data);
       setProductList(response.data.data);
     });
   };
@@ -94,7 +95,7 @@ function App() {
       (response) => {
         setProductList(
           productList.filter((val) => {
-            return val.id != id;
+            return val.product_id != id;
           })
         );
       }
@@ -369,31 +370,31 @@ function App() {
                 {currentPosts.map((val, key) => {
                   return (
                     <tr>
-                      <th scope="row">{val.id}</th>
+                      <th scope="row">{val.product_id}</th>
                       <td>
                         <a
-                          href={`http://localhost:3000/product/product-img/${val.img}`}
+                          href={`http://localhost:3000/product/product-img/${val.product_img}`}
                         >
                           <img
-                            src={`http://localhost:3000/product/product-img/${val.img}`}
+                            src={`http://localhost:3000/product/product-img/${val.product_img}`}
                             alt="Trulli"
                             width="40"
                             height="40"
                           ></img>
                         </a>
                       </td>
-                      <td>{val.sku}</td>
-                      <td>{val.name}</td>
-                      <td>{val.brand}</td>
-                      <td>{val.quantity}</td>
-                      <td>{val.price}</td>
-                      <td>{val.category}</td>
-                      <td>{val.discription}</td>
+                      <td>{val.product_sku}</td>
+                      <td>{val.product_name}</td>
+                      <td>{val.product_brand}</td>
+                      <td>{val.product_quantity}</td>
+                      <td>{val.product_price}</td>
+                      <td>{val.category_name}</td>
+                      <td>{val.product_discription}</td>
                       <td>
                         <a
                           href="#"
                           class="icon text-danger"
-                          onClick={() => deleteProduct(val.id)}
+                          onClick={() => deleteProduct(val.product_id)}
                         >
                           <i class="fa fa-trash-o "></i>
                         </a>
@@ -403,15 +404,15 @@ function App() {
                           class="icon"
                           style={{ marginLeft: "20px" }}
                           onClick={() => {
-                            setId(val.id);
+                            setId(val.product_id);
                             setUpdateProduct(true);
-                            setSku(val.sku);
-                            setName(val.name);
-                            setBrand(val.brand);
-                            setPrice(val.price);
+                            setSku(val.product_sku);
+                            setName(val.product_name);
+                            setBrand(val.product_brand);
+                            setPrice(val.product_price);
                             setQuantity(0);
-                            setCategory(val.category);
-                            setDescription(val.discription);
+                            setCategory(val.category_name);
+                            setDescription(val.product_discription);
                           }}
                         >
                           <i class="fa fa-pencil "></i>
