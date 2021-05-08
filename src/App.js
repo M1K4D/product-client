@@ -331,12 +331,14 @@ function App() {
                     type="file"
                     class="form-control"
                     aria-label="file example"
-                    a
                     onChange={(event) => {
                       setImg(event.target.files[0]);
                       console.log(event.target.files[0]);
                     }}
                   ></input>
+                  <label for="formFile" class="form-label">
+                    Input product image
+                  </label>
                 </div>
               </div>
             </div>
