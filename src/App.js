@@ -1,17 +1,15 @@
 import Axios from "axios";
 import { useState, useEffect } from "react";
-
-function addAlert() {
-  alert("add failed!");
-}
-
-function updateAlert() {
-  alert("update failed!");
-}
+import {
+  addProduct,
+  getProduct,
+  update,
+  uploadImg,
+  deleteProduct,
+} from "./funtions/FetchApi";
 
 function App() {
   const [productList, setProductList] = useState([]);
-  // const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
 
@@ -28,94 +26,56 @@ function App() {
 
   const [img, setImg] = useState({});
 
-  const getProduct = () => {
-    Axios.get("http://localhost:3000/product").then((response) => {
-      console.log(response.data.data);
-      setProductList(response.data.data);
-    });
-  };
-
-  const addProduct = (nameImg) => {
-    console.log(nameImg);
-    Axios.post("http://localhost:3000/product/create", {
-      img: nameImg,
-      sku: sku,
-      name: name,
-      brand: brand,
-      price: parseInt(price),
-      quantity: parseInt(quantity),
-      discription: description,
-      category: category,
-    })
-      .then((response) => {
-        getProduct();
-        // console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        addAlert();
-      });
-  };
-
-  const update = (id) => {
-    Axios.put(`http://localhost:3000/product/update/${id}`, {
-      name: name,
-      brand: brand,
-      price: parseInt(price),
-      quantity: parseInt(quantity),
-      discription: description,
-      category: category,
-    })
-      .then((response) => {
-        getProduct();
-        console.log(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        updateAlert();
-      });
-  };
-
-  async function uploadImg() {
-    const fd = new FormData();
-    fd.append("file", img, img.name);
-    const data = await Axios.post(
-      "http://localhost:3000/product/uploadimage",
-      fd
-    ).then((response) => {
-      console.log(response.data.imagePath);
-      return response.data.imagePath;
-    });
-
-    return data;
+  async function fetchProduct() {
+    const data = await getProduct();
+    setProductList(data);
   }
 
-  const deleteProduct = (id) => {
-    Axios.delete(`http://localhost:3000/product/delete/${id}`).then(
-      (response) => {
-        setProductList(
-          productList.filter((val) => {
-            return val.product_id != id;
-          })
-        );
-      }
+  async function handlerUpdate(id) {
+    const bodyUpdate = {
+      name: name,
+      brand: brand,
+      price: parseInt(price),
+      quantity: parseInt(quantity),
+      discription: description,
+      category: category,
+    };
+    await update(id, bodyUpdate);
+    await fetchProduct();
+  }
+
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const handlerDelete = (id) => {
+    deleteProduct(id);
+    setProductList(
+      productList.filter((val) => {
+        return val.product_id != id;
+      })
     );
   };
 
-  useEffect(() => {
-    getProduct((err) => {
-      console.log(err);
-      update();
-    });
-  }, []);
-
   async function handlerSubmit() {
     try {
-      const nameImg = await uploadImg();
-      addProduct(nameImg);
+      const nameImg = await uploadImg(img);
+      const productBody = {
+        img: nameImg,
+        sku: sku,
+        name: name,
+        brand: brand,
+        price: parseInt(price),
+        quantity: parseInt(quantity),
+        discription: description,
+        category: category,
+      };
+
+      await addProduct(productBody);
+      await fetchProduct();
     } catch (err) {
       console.log(err);
-      addAlert();
+      alert("add failed!");
     }
   }
 
@@ -286,7 +246,7 @@ function App() {
                 type="submit"
                 class="btn btn btn-success"
                 onClick={() => {
-                  update(id);
+                  handlerUpdate(id);
                   setQuantity("");
                 }}
               >
@@ -394,7 +354,7 @@ function App() {
                         <a
                           href="#"
                           class="icon text-danger"
-                          onClick={() => deleteProduct(val.product_id)}
+                          onClick={() => handlerDelete(val.product_id)}
                         >
                           <i class="fa fa-trash-o "></i>
                         </a>
