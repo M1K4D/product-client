@@ -56,3 +56,7 @@ export async function uploadImg(img) {
 export const deleteProduct = (id) => {
   Axios.delete(`http://localhost:3000/product/delete/${id}`);
 };
+
+export const deleteImg = (img) => {
+  Axios.delete(`http://localhost:3000/product/delete-img/${img}`);
+};

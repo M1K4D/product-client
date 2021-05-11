@@ -6,6 +6,7 @@ import {
   update,
   uploadImg,
   deleteProduct,
+  deleteImg,
 } from "./funtions/FetchApi";
 
 function App() {
@@ -48,8 +49,9 @@ function App() {
     fetchProduct();
   }, []);
 
-  const handlerDelete = (id) => {
+  const handlerDelete = (id, img) => {
     deleteProduct(id);
+    deleteImg(img);
     setProductList(
       productList.filter((val) => {
         return val.product_id != id;
@@ -354,7 +356,9 @@ function App() {
                         <a
                           href="#"
                           class="icon text-danger"
-                          onClick={() => handlerDelete(val.product_id)}
+                          onClick={() =>
+                            handlerDelete(val.product_id, val.product_img)
+                          }
                         >
                           <i class="fa fa-trash-o "></i>
                         </a>
