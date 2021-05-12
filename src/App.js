@@ -7,6 +7,7 @@ import {
   uploadImg,
   deleteProduct,
   deleteImg,
+  getCategory,
 } from "./funtions/FetchApi";
 
 function App() {
@@ -22,9 +23,11 @@ function App() {
   const [brand, setBrand] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("uncategory");
   const [description, setDescription] = useState("");
+  const [adCate, setAddCate] = useState(false);
 
+  const [cate, setCate] = useState([]);
   const [img, setImg] = useState({});
 
   async function fetchProduct() {
@@ -45,8 +48,14 @@ function App() {
     await fetchProduct();
   }
 
+  async function getCat() {
+    const data = await getCategory();
+    setCate(data);
+  }
+
   useEffect(() => {
     fetchProduct();
+    getCat();
   }, []);
 
   const handlerDelete = (id, img) => {
@@ -209,15 +218,52 @@ function App() {
                 Category
               </label>
               <div class="input-group">
-                <div class="input-group-text">Category</div>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="specificSizeInputGroupUsername"
-                  placeholder="Category"
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                ></input>
+                <div class="input-group-text ">Category</div>
+                {adCate ? (
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="inputCate"
+                    placeholder="Category"
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                  ></input>
+                ) : (
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    onChange={(event) => {
+                      setCategory(event.target.value);
+                      console.log("category", category);
+                    }}
+                  >
+                    {/* <option selected>select category</option> */}
+                    {cate.map((val, key) => {
+                      return <option value={val.name}>{val.name}</option>;
+                    })}
+                  </select>
+                )}
+                {adCate ? (
+                  <button
+                    type="submit"
+                    class="btn btn btn-primary"
+                    onClick={() => {
+                      setAddCate(false);
+                    }}
+                  >
+                    +
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    class="btn btn btn-primary"
+                    onClick={() => {
+                      setAddCate(true);
+                    }}
+                  >
+                    +
+                  </button>
+                )}
               </div>
             </div>
 

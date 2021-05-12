@@ -60,3 +60,15 @@ export const deleteProduct = (id) => {
 export const deleteImg = (img) => {
   Axios.delete(`http://localhost:3000/product/delete-img/${img}`);
 };
+
+export async function getCategory() {
+  const data = await Axios.get(`http://localhost:3000/caterory/getcate`)
+    .then((response) => {
+      console.log("cat", response.data);
+      return response.data;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return data;
+}
